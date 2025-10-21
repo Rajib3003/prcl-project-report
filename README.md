@@ -65,22 +65,103 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
+# version
+Php Version
+8.0.30
 
+Laravel Version
+9.52.21
+
+Laravel Locale
+en
+
+Laravel Config Cached
+false
+App Debug
+true
+App Env
+local
 
 # My information
 - node install
 - composer install
 - xampp install
 
+1. Composer diye Laravel install 
+- composer create-project laravel/laravel my-project-name
+- cd my-project-name
+
+2. .env file database setup.
 - before MySQL same name schema create korte hobe
 
-.env file database setup.
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=prcl_project_report
 DB_USERNAME=root
 DB_PASSWORD=
+
+3. Laravel Authenticaton Setup (React frontend use er jonno API Authentication lagbe)
+- Install Sanctum (composer require laravel/sanctum
+)
+- publish config & migrate (php artisan vendor:publish 
+- provider="Laravel\Sanctum\SanctumServiceProvider"
+php artisan migrate
+)
+- Add Sanctum middleware (app/Http/Kernel.php) er maje 
+- ('api' => [
+    \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+    'throttle:api',
+    \Illuminate\Routing\Middleware\SubstituteBindings::class,
+],
+)
+
+4. Create Models & Migratons
+- (php artisan make:model Project -m
+php artisan make:model Task -m
+php artisan make:model User -m
+php artisan make:migration create_task_user_table --create=task_user
+)
+- Projects Migration ei location e ((database/migrations/..._create_projects_table.php))
+- eivabe likhte hobe sob table a (Schema::create('projects', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->enum('status', ['active', 'inactive'])->default('active');
+    $table->timestamps();
+});
+)
+
+5. Migrate Database
+- php artisan migrate
+
+6. Seeders (Optional – Sample Data)
+- fack data insert korte seeders use kora hoy .
+- (php artisan make:seeder UserSeeder) sob table jonno 
+- sob table ar maje (
+    public function run(): void
+    {
+        // Admin User
+        User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'password' => bcrypt('password123'),
+            'role' => 'admin',
+        ]);
+
+        // Normal User
+        User::create([
+            'name' => 'Normal User',
+            'email' => 'user@example.com',
+            'password' => bcrypt('password123'),
+            'role' => 'user',
+        ]);
+    }
+)
+ei vabe data diye dite hobe . 
+- ei command use korte hobe(php artisan db:seed --class=UserSeeder
+)
+
+
 
 
 
