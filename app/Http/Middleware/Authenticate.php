@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Illuminate\Support\Facades\Route;
 
 class Authenticate extends Middleware
 {
@@ -14,14 +15,20 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
-        // if (! $request->expectsJson()) {
-        //     return route('login');
-        // }
-         // শুধু web routes এর জন্য redirect করো
-    if ($request->expectsJson()) {
-        return null; // API route-এ redirect হবে না, JSON 401 response
-    }
+        // For API requests we should not redirect to a web login route.
+        // If the request expects JSON (Accept: application/json) or is an API path
+        // (commonly /api/*) return null so Laravel returns a 401 JSON response
+        // instead of attempting to redirect to a `login` route that may not exist.
+        if ($request->expectsJson() || $request->is('api/*')) {
+            return null; // causes an AuthenticationException -> 401 JSON
+        }
 
-    return route('login'); // web route-এ redirect
+        // Only attempt to return the web login route if it's defined.
+        if (Route::has('login')) {
+            return route('login');
+        }
+
+        // No login route defined — treat as API/unauthenticated.
+        return null;
     }
 }
